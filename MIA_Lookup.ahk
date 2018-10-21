@@ -5,6 +5,14 @@
 ;To run and edit this script you will have to have AutoHotkey installed
 ;Get AutoHotkey here: https://autohotkey.com/
 
+;CHANGES
+;2018-10-18:
+;Removed the use of the qolibriCharacterLimit variable. Now the jisho lookup funciton only searches in jisho, no matter how small the searched text is.
+;Fixed a bug that the qolibri lookup function checked for the qolibriCharacterLimit even though that shouldn't make a difference.
+;
+;
+;
+
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
