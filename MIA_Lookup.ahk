@@ -10,7 +10,9 @@
 ;Removed the use of the qolibriCharacterLimit variable. Now the jisho lookup funciton only searches in jisho, no matter how small the searched text is.
 ;Fixed a bug that the qolibri lookup function checked for the qolibriCharacterLimit even though that shouldn't make a difference.
 ;
-;
+;2018-10-22:
+;Fixed the delay between a few actions. You can change the delay by changing the global 'sleepDuration' variable.
+;Fixed so the script keeps spacing when copying over to jisho and qolibri, before the script got rid of all the spaces.
 ;
 
 
@@ -36,12 +38,13 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;CHANGE THESE VALUES FOR YOUR OWN LIKING
 jishoEnabled = true ;Should jisho be enabled? aka bilingual or monolingual search
 qolibriCharacterLimit = 0 ; if what the selected word(s) are over this number, skip qolibri and only search in jisho
+sleepDuration := 25 ;How much delay between most actions in milliseconds. If the script isnt working properly, like if it doesnt copy correctly, then set this to something higher. Sometimes the script doesnt keep up if there is something like lagspikes.
+AutoTrim, Off ;This makes sure to keep the spaces in the selected string. Before the copied string would get rid of all the spaces.
 
 
 
 
 ;Global variables
-sleepDuration := 25
 isSetup := false
 positionsSet := 0
 jishoWindow :=
@@ -97,9 +100,9 @@ Numpad9::
 	;-----Copy Selected-----
 	Send, ^c
 	callWindow := WinExist("A")
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send, ^c
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	clipboardLen := StrLen(Clipboard)
 	originalSelection := Clipboard
 	
@@ -126,28 +129,28 @@ Numpad9::
 	
 	;-----Qolbri-----
 	Winactivate, ahk_exe qolibri.exe 
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	MouseClick, left, %qolibriX%, %qolibriY%
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send, {BackSpace 20}{Right 20}{BackSpace 20}
-	Sleep sleepDuration*2
+	Sleep %sleepDuration%*2
 	Send, %newStr%
-	Sleep sleepDuration*2
+	Sleep %sleepDuration%*2
 	Send, {Enter}
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	
 	
 	;-----Jisho-----
 	Winactivate, ahk_id %jishoWindow%
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	MouseClick, left, %jishoX%, %jishoY%
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send, {BackSpace 20}{Right 20}{BackSpace 20}
-	Sleep sleepDuration*2
+	Sleep %sleepDuration%*2
 	Send, %newStr%
-	Sleep sleepDuration*2
+	Sleep %sleepDuration%*2
 	Send, {Enter}
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	
 	
 	;wait for user to select a definition
@@ -157,13 +160,13 @@ Numpad9::
 	Winactivate, ahk_exe anki.exe
 	MouseMove, %mouseTempX%, %mouseTempY%
 	Send, {ShiftDown}{Tab}{ShiftUp}
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send, %originalSelection%
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send,  - 
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send, ^v
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 }
 return
 
@@ -206,16 +209,18 @@ Numpad8::
 	;-----Copy Selected-----
 	Send, ^c
 	callWindow := WinExist("A")
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send, ^c
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	clipboardLen := StrLen(Clipboard)
 	
 	;-----Parse Input-----
 	clip := Clipboard
 	char := SubStr(clip, 1, 1)
 	newStr := ""
-
+	
+	nbsp    := Chr(0x00A0)
+	
 	counter := 0
 	saveChar := 1
 	Loop, %clipboardLen%
@@ -236,30 +241,30 @@ Numpad8::
 	;-----Qolbri-----
 	if(StrLen(newStr) <= qolibriCharacterLimit){
 		Winactivate, ahk_exe qolibri.exe 
-		Sleep sleepDuration
+		Sleep %sleepDuration%
 		MouseClick, left, %qolibriX%, %qolibriY%
-		Sleep sleepDuration
+		Sleep %sleepDuration%
 		Send, {BackSpace 20}{Right 20}{BackSpace 20}
-		Sleep sleepDuration*2
+		Sleep %sleepDuration%*2
 		Send, %newStr%
-		Sleep sleepDuration*2
+		Sleep %sleepDuration%*2
 		Send, {Enter}
-		Sleep sleepDuration
+		Sleep %sleepDuration%
 	}
 	
 	
 	;-----Jisho-----
 	if(jishoEnabled){
 		Winactivate, ahk_id %jishoWindow%
-		Sleep sleepDuration
+		Sleep %sleepDuration%
 		MouseClick, left, %jishoX%, %jishoY%
-		Sleep sleepDuration
+		Sleep %sleepDuration%
 		Send, {BackSpace 20}{Right 20}{BackSpace 20}
-		Sleep sleepDuration*2
+		Sleep %sleepDuration%*2
 		Send, %newStr%
-		Sleep sleepDuration*2
+		Sleep %sleepDuration%*2
 		Send, {Enter}
-		Sleep sleepDuration
+		Sleep %sleepDuration%
 	}
 	
 	
@@ -305,9 +310,9 @@ Numpad7::
 	;-----Copy Selected-----
 	Send, ^c
 	callWindow := WinExist("A")
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send, ^c
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	clipboardLen := StrLen(Clipboard)
 	
 	;-----Parse Input-----
@@ -333,15 +338,15 @@ Numpad7::
 	
 	;-----Qolbri-----
 	Winactivate, ahk_exe qolibri.exe 
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	MouseClick, left, %qolibriX%, %qolibriY%
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	Send, {BackSpace 20}{Right 20}{BackSpace 20}
-	Sleep sleepDuration*2
+	Sleep %sleepDuration%*2
 	Send, %newStr%
-	Sleep sleepDuration*2
+	Sleep %sleepDuration%*2
 	Send, {Enter}
-	Sleep sleepDuration
+	Sleep %sleepDuration%
 	
 	;-----Return-----
 	Winactivate, ahk_id %callWindow%
