@@ -15,3 +15,5 @@ Fixed a bug that the qolibri lookup function checked for the qolibriCharacterLim
 Fixed the delay between a few actions. You can change the delay by changing the global 'sleepDuration' variable.
 
 Fixed so the script keeps spacing when copying over to jisho and qolibri, before the script got rid of all the spaces.
+
+Changed so the output of sentence cards have spaces before and after the dashes. Example before: 世界[せかい]-world, after: 世界[せかい] - world
