@@ -13,6 +13,8 @@
 ;2018-10-22:
 ;Fixed the delay between a few actions. You can change the delay by changing the global 'sleepDuration' variable.
 ;Fixed so the script keeps spacing when copying over to jisho and qolibri, before the script got rid of all the spaces.
+;Changed so the output of sentence cards have spaces before and after the dashes. Example before: 世界[せかい]-world, after: 世界[せかい] - world
+;
 ;
 
 
@@ -156,6 +158,7 @@ Numpad9::
 	;wait for user to select a definition
 	selectDefinition()
 	
+	nbsp    := Chr(0x00A0)
 	;-----Return-----
 	Winactivate, ahk_exe anki.exe
 	MouseMove, %mouseTempX%, %mouseTempY%
@@ -163,7 +166,7 @@ Numpad9::
 	Sleep %sleepDuration%
 	Send, %originalSelection%
 	Sleep %sleepDuration%
-	Send,  - 
+	Send, %nbsp%-%nbsp%
 	Sleep %sleepDuration%
 	Send, ^v
 	Sleep %sleepDuration%
@@ -218,8 +221,6 @@ Numpad8::
 	clip := Clipboard
 	char := SubStr(clip, 1, 1)
 	newStr := ""
-	
-	nbsp    := Chr(0x00A0)
 	
 	counter := 0
 	saveChar := 1
