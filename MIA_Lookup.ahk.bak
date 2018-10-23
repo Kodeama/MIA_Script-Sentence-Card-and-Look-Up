@@ -15,12 +15,17 @@
 ;Fixed so the script keeps spacing when copying over to jisho and qolibri, before the script got rid of all the spaces.
 ;Changed so the output of sentence cards have spaces before and after the dashes. Example before: 世界[せかい]-world, after: 世界[せかい] - world
 ;
+;2018-10-23:
+;Added tooltip to the cursor when the script hasn't been setup yet.
+;Added some more "CHANGE THESE VALUES FOR YOUR OWN LIKING" variables ('CoordMode, Client' and 'adminCheck') that might fix problems with the mouse movement and clicks not working correctly.
+;
 ;
 
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
+#SingleInstance force
 
 ;----------OVERVIEW OF THIS SCRIPT----------
 ;The set values are values that works well for me, it will most likely be different for you,
@@ -39,9 +44,11 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 ;CHANGE THESE VALUES FOR YOUR OWN LIKING
 jishoEnabled = true ;Should jisho be enabled? aka bilingual or monolingual search
+adminCheck = false ;Turn this on if you are having problem with the program clicking in jisho or qolibri.
 qolibriCharacterLimit = 0 ; if what the selected word(s) are over this number, skip qolibri and only search in jisho
 sleepDuration := 25 ;How much delay between most actions in milliseconds. If the script isnt working properly, like if it doesnt copy correctly, then set this to something higher. Sometimes the script doesnt keep up if there is something like lagspikes.
 AutoTrim, Off ;This makes sure to keep the spaces in the selected string. Before the copied string would get rid of all the spaces.
+CoordMode, Client ;Mouse positions will be saved relative to the active window's client area, which includes title bar etc, this is least OS dependent.
 
 
 
@@ -62,9 +69,25 @@ mouseTempX :=
 mouseTempY :=
 
 
+;This makes sure the script run as admin, this shouldnt be needed but apparently this fixed a mouseclick problem for some people.
+if (%adminCheck%) && (!A_IsAdmin)
+{
+    Run *RunAs "%A_ScriptFullPath%"
+	Sleep, 100
+    ExitApp
+}
 
-
-
+tooltipText = Select the qolibri window and put the mouse in the searchbox, then click one of the script buttons.
+while !isSetup
+{
+	if(positionsSet == 0)
+		tooltipText = Select the QOLIBRI window and put the mouse in the searchbox, then click one of the script buttons.
+	else
+		tooltipText = Select the JISHO window and put the mouse in the searchbox, then click one of the script buttons.
+	mousegetpos, x, y
+	tooltip, %tooltipText%, (x + 20), (y + 20), 1
+	Sleep, 50
+}
 
 
 ;For making sentence cards. Select the i+1 word in your sentence,
@@ -87,12 +110,15 @@ Numpad9::
 		positionsSet++
 		if(positionsSet == 1){ ;Qolbri
 			MouseGetPos, qolibriX, qolibriY
-			if(!jishoEnabled)
+			if(!jishoEnabled){
 				isSetup = true
+				ToolTip
+			}
 			return
 		}
 		if(positionsSet >= 2){ ;Jisho
 			isSetup = true
+			ToolTip
 			jishoWindow := WinExist("A")
 			MouseGetPos, jishoX, jishoY
 			return
@@ -130,7 +156,7 @@ Numpad9::
 	}
 	
 	;-----Qolbri-----
-	Winactivate, ahk_exe qolibri.exe 
+	Winactivate, ahk_exe qolibri.exe
 	Sleep %sleepDuration%
 	MouseClick, left, %qolibriX%, %qolibriY%
 	Sleep %sleepDuration%
@@ -158,7 +184,7 @@ Numpad9::
 	;wait for user to select a definition
 	selectDefinition()
 	
-	nbsp    := Chr(0x00A0)
+	nbsp := Chr(0x00A0)
 	;-----Return-----
 	Winactivate, ahk_exe anki.exe
 	MouseMove, %mouseTempX%, %mouseTempY%
@@ -197,12 +223,15 @@ Numpad8::
 		positionsSet++
 		if(positionsSet == 1){ ;Qolbri
 			MouseGetPos, qolibriX, qolibriY
-			if(!jishoEnabled)
+			if(!jishoEnabled){
 				isSetup = true
+				ToolTip
+			}
 			return
 		}
 		if(positionsSet >= 2){ ;Jisho
 			isSetup = true
+			ToolTip
 			jishoWindow := WinExist("A")
 			MouseGetPos, jishoX, jishoY
 			return
@@ -296,12 +325,15 @@ Numpad7::
 		positionsSet++
 		if(positionsSet == 1){ ;Qolbri
 			MouseGetPos, qolibriX, qolibriY
-			if(!jishoEnabled)
+			if(!jishoEnabled){
 				isSetup = true
+				ToolTip
+			}
 			return
 		}
 		if(positionsSet >= 2){ ;Jisho
 			isSetup = true
+			ToolTip
 			jishoWindow := WinExist("A")
 			MouseGetPos, jishoX, jishoY
 			return
